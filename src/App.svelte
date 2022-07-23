@@ -1,27 +1,31 @@
 <script>
-
   import Thermometer from "./lib/Thermometer.svelte";
-  /*import Twitch from './classes/Twitch';
-
-
-  const twitch = new Twitch();
+  import twitchController from "./controllers/twitchController";
 
   let queryParams = location.hash;
-
-  twitch.setAccessToken(queryParams);*/
+  twitchController.connect(queryParams);
 </script>
 
 <main>
   <div>
-    <!--{#if !twitch.isConnected()}
-      <a href="{twitch.generateUrl()}">Login Twitch</a>
+    {#if !twitchController.isConnected()}
+      <a href="{twitchController.getTwitchAuthUrl()}">Login Twitch</a>
     {:else }
-      <Thermometer client="{twitch}"/>
-    {/if}-->
-    <Thermometer />
+      <Thermometer twitch={twitchController}/>
+    {/if}
   </div>
 </main>
 
 <style>
+  a {
+    border: 3px solid #747bff;
+    border-radius: 5px;
+    padding: 15px;
+    color: #c2d7fb;
+  }
 
+  a:hover {
+    background-color: #747bff;
+    color: #000;
+  }
 </style>

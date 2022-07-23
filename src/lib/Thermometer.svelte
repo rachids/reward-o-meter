@@ -1,33 +1,29 @@
 <script>
     import { fade, fly } from 'svelte/transition';
     import {tweened} from "svelte/motion";
+    import {onMount} from "svelte";
 
-    /*export let client;
+    export let twitch;
 
-    let test = '';
-
-    if (!client.isConnected()) {
-        throw 'Client is not connected to Twitch';
-    }
-
-    const increment = (message) => {
-        test = `${message.userDisplayName} a chopé ${message.rewardTitle}`;
-    }
-
-    const pubSubClient = client.listen();
-
-    pubSubClient.onRedemption(client.userId, (message) => {
-        increment(message);
-    });*/
     let score = tweened(0, {
         duration: 2000,
         interpolate: (from, to) => t => Math.round(t*10)
     });
     let dropIsVisible = false;
+    let redemptionMessage = '';
 
-    const increment = () => {
+    onMount(async () => {
+        let client = await twitch.getPubSubClient();
+        await client.onRedemption(twitch.getStreamerId(), (message) => {
+            // Send an event to trigger animation + register new score
+            increment(message);
+        });
+    })
+
+    const increment = (message) => {
         dropIsVisible = true;
         score.set($score + 10);
+        redemptionMessage = `${message.userDisplayName} a chopé ${message.rewardTitle}`;
     }
 
     const resetDrop = () => {
@@ -41,7 +37,6 @@
         const calcPourcent = (amountInPercentage * divGlass.clientHeight) / 100;
         const totalToAdd = divLiquid.clientHeight + calcPourcent;
         root.style.setProperty("--liquid-height", totalToAdd + "px");
-//        score = (totalToAdd / divGlass.clientHeight) * 100;
     };
 </script>
 
@@ -61,8 +56,7 @@
         %
     </div>
 </div>
-
-<button on:click={increment} disabled={dropIsVisible}>Click</button>
+<span class="redemption-message" in:fade out:fly>{redemptionMessage}</span>
 
 <style>
     :root {
