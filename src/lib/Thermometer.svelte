@@ -1,5 +1,6 @@
 <script>
     import { fade, fly } from 'svelte/transition';
+    import {tweened} from "svelte/motion";
 
     /*export let client;
 
@@ -18,12 +19,15 @@
     pubSubClient.onRedemption(client.userId, (message) => {
         increment(message);
     });*/
-    let score = 0;
+    let score = tweened(0, {
+        duration: 2000,
+        interpolate: (from, to) => t => Math.round(t*10)
+    });
     let dropIsVisible = false;
 
     const increment = () => {
         dropIsVisible = true;
-        score += 10;
+        score.set($score + 10);
     }
 
     const resetDrop = () => {
@@ -37,7 +41,7 @@
         const calcPourcent = (amountInPercentage * divGlass.clientHeight) / 100;
         const totalToAdd = divLiquid.clientHeight + calcPourcent;
         root.style.setProperty("--liquid-height", totalToAdd + "px");
-        score = (totalToAdd / divGlass.clientHeight) * 100;
+//        score = (totalToAdd / divGlass.clientHeight) * 100;
     };
 </script>
 
@@ -53,7 +57,7 @@
     </div>
     <div class="label">
         OBJECTIF:
-        <span id="score">{score}</span>
+        <span id="score">{$score}</span>
         %
     </div>
 </div>
